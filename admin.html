@@ -36,6 +36,15 @@
     .login-error { color: #f87171; font-size: 0.85rem; margin-bottom: 1rem; min-height: 1.2em; }
     .admin-container { display: none; }
     .admin-container.visible { display: block; }
+    
+    /* Responsive Admin */
+    @media (max-width: 768px) {
+      body { padding: var(--space-md) var(--space-sm); }
+      .admin-header { flex-direction: column; text-align: center; gap: var(--space-md); }
+      .stat-cards { grid-template-columns: 1fr; }
+      .login-card { padding: 2rem 1.5rem; margin: 0 var(--space-md); }
+      .admin-header div h1 { font-size: 1.5rem !important; }
+    }
   </style>
 </head>
 <body>
@@ -164,7 +173,10 @@
       const tableBody = document.getElementById('tableBody');
       try {
         const response = await fetch('/api/data');
-        if (!response.ok) throw new Error('Network response was not ok');
+        if (!response.ok) {
+          const errRes = await response.json().catch(() => ({}));
+          throw new Error(errRes.error || `HTTP Error ${response.status}`);
+        }
         const result = await response.json();
         globalData = result.data;
         renderDashboard(globalData);
@@ -175,8 +187,10 @@
             <td colspan="8">
               <div class="error-state">
                 <span style="font-size: 2rem; display: block; margin-bottom: 10px;">⚠️</span>
-                <strong>Gagal terhubung ke Server!</strong><br>
-                Pastikan server backend (Node.js) di folder /backend sudah dijalankan (<code>npm start</code>).
+                <strong>Gagal memuat data dari server!</strong><br><br>
+                <code>Detail Error: ${error.message}</code><br><br>
+                Kemungkinan penyebab:<br>
+                Pastikan Anda sudah mengatur <strong>SUPABASE_URL</strong> dan <strong>SUPABASE_SERVICE_ROLE_KEY</strong> pada Environment Variables di dashboard Vercel Anda.
               </div>
             </td>
           </tr>

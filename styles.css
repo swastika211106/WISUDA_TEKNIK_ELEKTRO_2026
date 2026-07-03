@@ -1214,16 +1214,20 @@ body::before {
 /* ── Responsive Design ── */
 @media (max-width: 768px) {
   .app-container {
-    padding: var(--space-md) var(--space-sm);
+    padding: var(--space-sm);
   }
 
   .glass-card {
-    padding: var(--space-xl) var(--space-lg);
+    padding: var(--space-lg) var(--space-md);
     border-radius: var(--radius-lg);
   }
 
   .landing-title {
-    font-size: 1.7rem;
+    font-size: 1.6rem;
+  }
+  
+  .landing-subtitle {
+    font-size: 0.95rem;
   }
 
   .features-grid {
