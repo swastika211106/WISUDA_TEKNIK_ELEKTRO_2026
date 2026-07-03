@@ -198,6 +198,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         const result = await response.json();
+        if (!response.ok) {
+           throw new Error(result.error || 'Terjadi kesalahan pada server');
+        }
+        
         console.log('Server response:', result);
         
         // Simpan ke localStorage juga sebagai backup/export CSV
