@@ -11,7 +11,7 @@ export default function handler(req, res) {
 
     // Password di-hardcode langsung di kode sesuai permintaan Anda
     // Anda bisa mengganti 'Panitia2026!' dengan password pilihan Anda
-    const ADMIN_PASSWORD = 'Panitia2026!';
+    const ADMIN_PASSWORD = 'PANITIAWISUDA2026';
 
     if (!ADMIN_PASSWORD) {
         return res.status(500).json({ error: 'Admin password belum dikonfigurasi di server.' });

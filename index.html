@@ -34,8 +34,37 @@
       </div>
     </div>
 
+    <!-- STEP -1: GATEWAY (PILIH ROLE) -->
+    <section class="step-section active" id="step-gateway" data-step="gateway">
+      <div class="glass-card" style="text-align: center; max-width: 500px; margin: 0 auto;">
+        
+        <div class="landing-badge" style="margin-bottom: 2rem;">
+          <span class="badge-dot"></span>
+          Periode Wisuda 2026
+        </div>
+
+        <h1 class="landing-title" style="margin-bottom: 2rem;">
+          Selamat Datang!<br>
+          <span class="gradient-text">Silakan Pilih Akses</span>
+        </h1>
+
+        <p class="landing-subtitle" style="margin-bottom: 2rem;">
+          Apakah Anda seorang wisudawan yang ingin mengisi survei, atau panitia yang ingin melihat hasil survei?
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <button type="button" class="btn btn-primary btn-lg btn-block" onclick="goToStep('landing')">
+            <span class="btn-text">🎓 Saya Wisudawan</span>
+          </button>
+          <button type="button" class="btn btn-secondary btn-lg btn-block" onclick="window.location.href='/admin.html'">
+            <span class="btn-text">🔐 Saya Panitia</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
     <!-- STEP 0: LANDING PAGE -->
-    <section class="step-section active" id="step-landing" data-step="landing">
+    <section class="step-section" id="step-landing" data-step="landing">
       <div class="glass-card">
 
         <div class="landing-badge">

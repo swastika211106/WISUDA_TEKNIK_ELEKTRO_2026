@@ -4,7 +4,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     // ─── STATE MANAGEMENT ───
-    let currentStep = 'landing';
+    let currentStep = 'gateway';
     const totalSteps = 3;
     const formData = {}; 
   
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   
     function updateProgressBar(step) {
-      if (step === 'landing' || step === 'thankyou') {
+      if (step === 'gateway' || step === 'landing' || step === 'thankyou') {
         progressWrapper.classList.remove('active');
         return;
       }
