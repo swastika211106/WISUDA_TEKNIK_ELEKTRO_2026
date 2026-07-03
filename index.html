@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Survei Preferensi Acara Wisuda Teknik Elektro — Menyerap aspirasi dan keinginan wisudawan">
+  <title>Survei Preferensi Wisuda Teknik Elektro</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- Floating Particles Background -->
+  <div class="particles" aria-hidden="true">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="app-container">
+
+    <!-- PROGRESS BAR -->
+    <div class="progress-wrapper" id="progressWrapper">
+      <div class="progress-header">
+        <span class="progress-label" id="progressLabel">Halaman 1 dari 3</span>
+        <span class="progress-percentage" id="progressPercent">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <!-- STEP 0: LANDING PAGE -->
+    <section class="step-section active" id="step-landing" data-step="landing">
+      <div class="glass-card">
+
+        <div class="landing-badge">
+          <span class="badge-dot"></span>
+          Periode Wisuda 2026
+        </div>
+
+        <h1 class="landing-title">
+          Survei Preferensi Wisuda<br>
+          <span class="gradient-text">Jurusan Teknik Elektro 🎓</span>
+        </h1>
+
+        <p class="landing-subtitle">
+          Selamat atas kelulusan Anda! Kami ingin merancang acara wisuda yang berkesan dan sesuai dengan harapan para lulusan. Melalui survei ini, kami meminta pendapat Anda mengenai konsep, lokasi, dan preferensi acara wisuda yang Anda inginkan. Survei ini <strong>hanya membutuhkan waktu sekitar 2-3 menit</strong>.
+        </p>
+
+        <!-- Features Grid -->
+        <div class="features-grid">
+          <div class="feature-item">
+            <span class="feature-icon">⚡</span>
+            <div class="feature-text">
+              <h4>Singkat & Padat</h4>
+              <p>Hanya ~3 menit untuk menyampaikan preferensi Anda</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🎯</span>
+            <div class="feature-text">
+              <h4>Acara Impian</h4>
+              <p>Membantu panitia mewujudkan wisuda sesuai keinginan angkatan</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Incentive Banner -->
+        <div class="incentive-banner">
+          <span class="incentive-icon">🏆</span>
+          <div class="incentive-content">
+            <h4>Suara Anda Berarti!</h4>
+            <p>
+              Hasil dari survei ini akan menjadi pertimbangan utama panitia dalam menentukan konsep dan jalannya acara wisuda.
+            </p>
+          </div>
+        </div>
+
+        <!-- Consent Form -->
+        <div class="consent-wrapper" id="consentWrapper">
+          <label class="consent-label" for="consentCheckbox">
+            <div class="custom-checkbox">
+              <input type="checkbox" id="consentCheckbox">
+              <span class="checkmark"></span>
+            </div>
+            <span>
+              Saya bersedia mengisi survei preferensi ini. Saya memahami bahwa data yang saya berikan akan digunakan oleh panitia sebagai bahan pertimbangan untuk merencanakan acara wisuda yang terbaik.
+            </span>
+          </label>
+        </div>
+        <div class="form-error" id="consentError">
+          ⚠️ Anda harus menyetujui pernyataan di atas untuk melanjutkan
+        </div>
+
+        <button type="button" class="btn btn-primary btn-lg btn-block" id="btnStart" disabled>
+          <span class="btn-text">Mulai Kuesioner →</span>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- FORM WRAPPER -->
+    <form id="surveyForm" novalidate autocomplete="off">
+
+      <!-- Honeypot Anti-Spam -->
+      <div class="honeypot-field" aria-hidden="true">
+        <label for="website_url">Website</label>
+        <input type="text" id="website_url" name="website_url" tabindex="-1" autocomplete="off">
+      </div>
+
+      <!-- STEP 1: DATA DEMOGRAFI (IDENTITAS BARU) -->
+      <section class="step-section" id="step-1" data-step="1">
+        <div class="glass-card">
+
+          <div class="section-header">
+            <div class="section-step-label"><span class="step-number">1</span>Langkah 1 dari 3</div>
+            <h2 class="section-title">Identitas Wisudawan</h2>
+            <p class="section-description">Mohon lengkapi data identitas Anda sebagai lulusan Teknik Elektro.</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inputNama">Nama Lengkap <span class="required">*</span></label>
+            <input type="text" class="form-input" id="inputNama" name="nama" required
+              placeholder="Masukkan nama lengkap beserta gelar">
+            <div class="form-error" id="namaError">⚠️ Silakan isi nama Anda</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inputEmail">Email <span class="required">*</span></label>
+            <input type="email" class="form-input" id="inputEmail" name="email" required
+              placeholder="contoh@mahasiswa.ac.id">
+            <div class="form-error" id="emailError">⚠️ Silakan isi email yang valid</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inputKelas">Kelas <span class="required">*</span></label>
+            <input type="text" class="form-input" id="inputKelas" name="kelas" required
+              placeholder="Contoh: Elektro A 2020">
+            <div class="form-error" id="kelasError">⚠️ Silakan isi kelas Anda</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inputNim">NIM (Nomor Induk Mahasiswa) <span class="required">*</span></label>
+            <input type="text" class="form-input" id="inputNim" name="nim" required placeholder="Contoh: 190100xxx">
+            <div class="form-error" id="nimError">⚠️ Silakan isi NIM Anda</div>
+          </div>
+
+          <!-- Navigation -->
+          <div class="btn-group">
+            <button type="button" class="btn btn-secondary" onclick="goToStep('landing')">← Kembali</button>
+            <button type="button" class="btn btn-primary" onclick="goToStep(2)">Lanjutkan →</button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- STEP 2: PREFERENSI ACARA WISUDA -->
+      <section class="step-section" id="step-2" data-step="2">
+        <div class="glass-card">
+
+          <div class="section-header">
+            <div class="section-step-label"><span class="step-number">2</span>Langkah 2 dari 3</div>
+            <h2 class="section-title">Preferensi Acara Wisuda</h2>
+            <p class="section-description">Bantu kami merencanakan acara wisuda yang berkesan bagi Anda.</p>
+          </div>
+
+          <!-- Radio: Lokasi -->
+          <div class="form-group">
+            <label class="form-label">Opsi Lokasi Wisuda yang Diharapkan <span class="required">*</span></label>
+            <div class="radio-group" id="lokasiGroup">
+              <div class="radio-option">
+                <input type="radio" name="lokasi" id="loc1" value="MG Setos Hotel" required>
+                <label for="loc1"><span class="radio-dot"></span> MG Setos Hotel</label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" name="lokasi" id="loc2" value="PO Hotel">
+                <label for="loc2"><span class="radio-dot"></span> PO Hotel</label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" name="lokasi" id="loc3" value="Patra Semarang Hotel & Convention">
+                <label for="loc3"><span class="radio-dot"></span> Patra Semarang Hotel & Convention</label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" name="lokasi" id="loc4" value="Grand Admiral Ballroom">
+                <label for="loc4"><span class="radio-dot"></span> Grand Admiral Ballroom</label>
+              </div>
+            </div>
+            <div class="form-error" id="lokasiError">⚠️ Silakan pilih opsi lokasi wisuda</div>
+          </div>
+
+          <!-- Radio: Pakaian -->
+          <div class="form-group">
+            <label class="form-label">Pakaian yang Digunakan Saat Acara <span class="required">*</span></label>
+            <div class="radio-group" id="pakaianGroup">
+              <div class="radio-option">
+                <input type="radio" name="pakaian" id="pak1" value="Setelan Jas Warna Gelap (Hitam, Navy, Dark)" required>
+                <label for="pak1"><span class="radio-dot"></span> Setelan Jas Warna Gelap (Hitam, Navy, dll) - Pria & Wanita</label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" name="pakaian" id="pak2" value="Kemeja Batik Bawahan Hitam">
+                <label for="pak2"><span class="radio-dot"></span> Kemeja Batik Bawahan Hitam - Pria & Wanita</label>
+              </div>
+            </div>
+            <div class="form-error" id="pakaianError">⚠️ Silakan pilih pakaian yang digunakan</div>
+          </div>
+
+          <!-- Checkbox: Konsep Hiburan -->
+          <div class="form-group">
+            <label class="form-label">Pemilihan Konsep Hiburan <span
+                class="required">*</span> <span class="optional">(Pilih lebih dari satu)</span></label>
+            <div class="checkbox-group" id="hiburanGroup">
+              <div class="checkbox-option">
+                <input type="checkbox" name="hiburan" id="hib1" value="DJ">
+                <label for="hib1"><span class="check-box"></span> DJ</label>
+              </div>
+              <div class="checkbox-option">
+                <input type="checkbox" name="hiburan" id="hib2" value="Band">
+                <label for="hib2"><span class="check-box"></span> Band</label>
+              </div>
+              <div class="checkbox-option">
+                <input type="checkbox" name="hiburan" id="hib3" value="Konser">
+                <label for="hib3"><span class="check-box"></span> Konser</label>
+              </div>
+            </div>
+            <div class="form-error" id="hiburanError">⚠️ Silakan pilih minimal satu konsep hiburan</div>
+          </div>
+
+          <!-- Navigation -->
+          <div class="btn-group">
+            <button type="button" class="btn btn-secondary" onclick="goToStep(1)">← Kembali</button>
+            <button type="button" class="btn btn-primary" onclick="goToStep(3)">Lanjutkan →</button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- STEP 3: PESAN & KESAN -->
+      <section class="step-section" id="step-3" data-step="3">
+        <div class="glass-card">
+
+          <div class="section-header">
+            <div class="section-step-label"><span class="step-number">3</span>Langkah 3 dari 3</div>
+            <h2 class="section-title">Kesan & Pesan Akhir</h2>
+            <p class="section-description">Berikan masukan terakhir Anda sebelum berpisah dengan kampus tercinta.</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inputSaran">Apa saran perbaikan utama untuk Jurusan Teknik Elektro ke
+              depannya? <span class="required">*</span></label>
+            <input type="text" class="form-input" id="inputSaran" name="saran" required
+              placeholder="Tuliskan masukan konkrit Anda...">
+            <div class="form-error" id="saranError">⚠️ Silakan isi masukan Anda</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="textareaPesan">Pesan untuk Adik Tingkat / Angkatan di Bawah <span
+                class="optional">(opsional)</span></label>
+            <textarea class="form-textarea" id="textareaPesan" name="pesan"
+              placeholder="Sampaikan wejangan, motivasi, atau tips bertahan hidup di Elektro..."></textarea>
+          </div>
+
+          <!-- Navigation & Submit -->
+          <div class="btn-group">
+            <button type="button" class="btn btn-secondary" onclick="goToStep(2)">← Kembali</button>
+            <button type="button" class="btn btn-primary" id="btnSubmit" onclick="handleSubmit()">
+              <span class="btn-text">✨ Kirim Preferensi Anda</span>
+              <span class="spinner"></span>
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+    </form>
+
+    <!-- STEP 5: THANK YOU PAGE -->
+    <section class="step-section" id="step-thankyou" data-step="thankyou">
+      <div class="glass-card">
+        <div class="thankyou-wrapper">
+
+          <div class="success-icon-wrapper">
+            <div class="success-circle"><span class="success-check">✓</span></div>
+            <div class="success-rings"></div>
+          </div>
+
+          <h2 class="thankyou-title">Selamat Lulus, Engineer! 🎉</h2>
+          <p class="thankyou-subtitle">
+            Jawaban Anda berhasil kami terima dan akan menjadi pertimbangan berharga bagi panitia wisuda. Terima kasih atas partisipasi Anda,
+            sukses selalu di dunia kerja industri maupun karir selanjutnya!
+          </p>
+
+          <div class="confirmation-card">
+            <h4>✅ Kuesioner Selesai</h4>
+            <p>Jawaban kuesioner Anda telah berhasil kami simpan. Silakan simpan ID Bukti berikut sebagai tanda bukti pengisian:</p>
+            <span class="ref-code" id="refCode">ELEKTRO-XXXXXX</span>
+          </div>
+
+          <button type="button" class="btn btn-secondary btn-block btn-export" id="btnExportCSV"
+            onclick="exportToCSV()">
+            📥 Unduh Bukti Pengisian
+          </button>
+
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

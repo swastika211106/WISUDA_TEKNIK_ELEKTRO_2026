@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Data Wisuda Elektro</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { padding: var(--space-xl); }
+    .admin-container { max-width: 1400px; margin: 0 auto; }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl); }
+    .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-md); margin-bottom: var(--space-2xl); }
+    .stat-card { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-lg); padding: var(--space-lg); text-align: center; backdrop-filter: blur(10px); }
+    .stat-value { font-size: 2.5rem; font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: var(--space-xs); }
+    .stat-label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; }
+    .table-responsive { overflow-x: auto; background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-lg); backdrop-filter: blur(10px); }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
+    thead { background: rgba(255, 255, 255, 0.05); }
+    th, td { padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--border-glass); }
+    th { font-weight: 700; color: var(--text-primary); white-space: nowrap; }
+    td { color: var(--text-secondary); vertical-align: top; }
+    tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+    tbody tr:last-child td { border-bottom: none; }
+    .badge-peminatan { display: inline-block; padding: 4px 8px; background: rgba(45, 212, 191, 0.15); color: var(--accent-teal); border-radius: var(--radius-sm); font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+    .badge-pakaian { display: inline-block; padding: 4px 8px; background: rgba(102, 126, 234, 0.15); color: var(--primary-500); border-radius: var(--radius-sm); font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+    .loading-state, .error-state, .empty-state { text-align: center; padding: var(--space-3xl); color: var(--text-secondary); }
+    /* === LOGIN OVERLAY === */
+    .login-overlay { position: fixed; inset: 0; background: var(--bg-primary, #0a0a0f); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .login-overlay.hidden { display: none; }
+    .login-card { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-xl, 20px); padding: 3rem 2.5rem; width: 100%; max-width: 400px; text-align: center; backdrop-filter: blur(20px); }
+    .login-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .login-title { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.5rem; }
+    .login-subtitle { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 2rem; }
+    .login-input { width: 100%; padding: 0.85rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); border-radius: var(--radius-md, 10px); color: var(--text-primary); font-size: 1rem; outline: none; margin-bottom: 1rem; box-sizing: border-box; text-align: center; letter-spacing: 0.15em; }
+    .login-input:focus { border-color: var(--primary-500, #667eea); }
+    .login-error { color: #f87171; font-size: 0.85rem; margin-bottom: 1rem; min-height: 1.2em; }
+    .admin-container { display: none; }
+    .admin-container.visible { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN OVERLAY — hanya panitia yang tahu password bisa masuk -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+      <div class="login-icon">🔐</div>
+      <h1 class="login-title">Akses Panitia</h1>
+      <p class="login-subtitle">Masukkan password untuk melihat hasil survei wisudawan</p>
+      <input
+        type="password"
+        class="login-input"
+        id="loginPassword"
+        placeholder="Password panitia"
+        onkeydown="if(event.key==='Enter') doLogin()"
+      >
+      <div class="login-error" id="loginError"></div>
+      <button class="btn btn-primary btn-block" id="loginBtn" onclick="doLogin()" style="width:100%">
+        <span class="btn-text">Masuk ke Dashboard →</span>
+        <span class="spinner"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="particles" aria-hidden="true">
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+  </div>
+
+  <div class="admin-container" id="adminContainer">
+    <div class="admin-header">
+      <div>
+        <h1 class="landing-title" style="font-size: 2rem; margin-bottom: 5px;">Dashboard Admin</h1>
+        <p style="color: var(--text-muted);">Rekapitulasi Preferensi Wisuda Teknik Elektro</p>
+      </div>
+      <button class="btn btn-primary" onclick="downloadAllCSV()" id="btnDownload">
+        📥 Export Semua Data (CSV)
+      </button>
+    </div>
+
+    <!-- Statistik Singkat -->
+    <div class="stat-cards">
+      <div class="stat-card">
+        <div class="stat-value" id="totalResponden">-</div>
+        <div class="stat-label">Total Responden</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="avgLab">-</div>
+        <div class="stat-label">Rata-rata Kepuasan Lab (1-5)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="avgDosen">-</div>
+        <div class="stat-label">Rata-rata Bimbingan (1-5)</div>
+      </div>
+    </div>
+
+    <!-- Tabel Data -->
+    <div class="table-responsive">
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th>Waktu Submit</th>
+            <th>NIM</th>
+            <th>Nama & Kelas</th>
+            <th>Lokasi Wisuda</th>
+            <th>Pakaian</th>
+            <th>Konsep Hiburan</th>
+            <th>Kepuasan (Lab/Dsn/Adm)</th>
+            <th>Saran Utama</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr>
+            <td colspan="8">
+              <div class="loading-state">
+                <span class="spinner" style="display:inline-block; position:relative; margin-bottom: 10px;"></span>
+                <br>Memuat data dari server...
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    let globalData = [];
+
+    // === LOGIN LOGIC ===
+    async function doLogin() {
+      const password = document.getElementById('loginPassword').value;
+      const loginBtn  = document.getElementById('loginBtn');
+      const loginError = document.getElementById('loginError');
+
+      if (!password) { loginError.textContent = 'Masukkan password terlebih dahulu.'; return; }
+
+      loginBtn.classList.add('btn-loading');
+      loginError.textContent = '';
+
+      try {
+        const res = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        const result = await res.json();
+
+        if (result.success) {
+          document.getElementById('loginOverlay').classList.add('hidden');
+          document.getElementById('adminContainer').classList.add('visible');
+          fetchData();
+        } else {
+          loginError.textContent = '❌ Password salah. Coba lagi.';
+          document.getElementById('loginPassword').value = '';
+          document.getElementById('loginPassword').focus();
+        }
+      } catch (e) {
+        loginError.textContent = 'Tidak dapat terhubung ke server.';
+      } finally {
+        loginBtn.classList.remove('btn-loading');
+      }
+    }
+
+    // === DASHBOARD LOGIC ===
+    async function fetchData() {
+      const tableBody = document.getElementById('tableBody');
+      try {
+        const response = await fetch('/api/data');
+        if (!response.ok) throw new Error('Network response was not ok');
+        const result = await response.json();
+        globalData = result.data;
+        renderDashboard(globalData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="8">
+              <div class="error-state">
+                <span style="font-size: 2rem; display: block; margin-bottom: 10px;">⚠️</span>
+                <strong>Gagal terhubung ke Server!</strong><br>
+                Pastikan server backend (Node.js) di folder /backend sudah dijalankan (<code>npm start</code>).
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    function renderDashboard(data) {
+      const tableBody = document.getElementById('tableBody');
+      
+      if (data.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="8">
+              <div class="empty-state">Belum ada data responden yang masuk ke database.</div>
+            </td>
+          </tr>
+        `;
+        document.getElementById('totalResponden').innerText = '0';
+        return;
+      }
+
+      document.getElementById('totalResponden').innerText = data.length;
+      const totalLab = data.reduce((sum, row) => sum + (row.likert_lab || 0), 0);
+      const totalDosen = data.reduce((sum, row) => sum + (row.likert_dosen || 0), 0);
+      
+      document.getElementById('avgLab').innerText = (totalLab / data.length).toFixed(1);
+      document.getElementById('avgDosen').innerText = (totalDosen / data.length).toFixed(1);
+
+      let html = '';
+      data.forEach(row => {
+        const dateObj = new Date(row.timestamp);
+        const dateStr = dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }) + ' ' + dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+        html += `
+          <tr>
+            <td style="white-space: nowrap">${dateStr}</td>
+            <td><strong>${escapeHtml(row.nim)}</strong></td>
+            <td>
+                ${escapeHtml(row.nama)}<br>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">${escapeHtml(row.email)} | Kelas: ${escapeHtml(row.kelas)}</span>
+            </td>
+            <td><span class="badge-peminatan">${escapeHtml(row.lokasi)}</span></td>
+            <td><span class="badge-pakaian">${escapeHtml(row.pakaian)}</span></td>
+            <td style="max-width: 200px; font-size: 0.8rem;">${escapeHtml(row.hiburan)}</td>
+            <td style="white-space: nowrap">🧪 ${row.likert_lab} &nbsp; 👨‍🏫 ${row.likert_dosen} &nbsp; 🏢 ${row.likert_admin}</td>
+            <td style="max-width: 250px;">
+              <div style="max-height: 80px; overflow-y: auto; padding-right: 5px;">${escapeHtml(row.saran)}</div>
+            </td>
+          </tr>
+        `;
+      });
+      tableBody.innerHTML = html;
+    }
+
+    function downloadAllCSV() {
+      if (globalData.length === 0) { alert('Tidak ada data untuk diekspor!'); return; }
+      const headers = Object.keys(globalData[0]);
+      const csvRows = globalData.map(row => {
+        return headers.map(header => {
+          let cell = row[header] === null || row[header] === undefined ? '' : row[header];
+          cell = cell.toString().replace(/"/g, '""');
+          if (cell.search(/("|,|\n)/g) >= 0) cell = `"${cell}"`;
+          return cell;
+        }).join(',');
+      });
+      const csvContent = headers.join(',') + '\n' + csvRows.join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Rekap_Wisuda_Elektro_${new Date().toISOString().slice(0,10)}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function escapeHtml(unsafe) {
+      if (!unsafe) return '';
+      return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>

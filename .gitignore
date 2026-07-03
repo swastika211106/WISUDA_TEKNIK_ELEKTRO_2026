@@ -1,0 +1,15 @@
+# File environment dan kredensial — JANGAN diupload ke publik!
+backend/.env
+.env.local
+backend/google-credentials.json
+
+# Database lokal
+backend/database.sqlite
+
+# Dependency Node.js — akan diinstall ulang oleh server hosting
+backend/node_modules/
+node_modules/
+
+# Log files
+*.log
+npm-debug.log*
