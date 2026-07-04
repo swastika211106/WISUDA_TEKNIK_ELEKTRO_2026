@@ -81,7 +81,7 @@
         <p style="color: var(--text-muted);">Rekapitulasi Preferensi Wisuda Teknik Elektro</p>
       </div>
       <button class="btn btn-primary" onclick="downloadAllCSV()" id="btnDownload">
-        📥 Export Semua Data (CSV)
+        📥 Export ke Excel
       </button>
     </div>
 
@@ -92,12 +92,12 @@
         <div class="stat-label">Total Responden</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value" id="avgLab">-</div>
-        <div class="stat-label">Rata-rata Kepuasan Lab (1-5)</div>
+        <div class="stat-value" id="domLokasi">-</div>
+        <div class="stat-label">Lokasi Terfavorit</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value" id="avgDosen">-</div>
-        <div class="stat-label">Rata-rata Bimbingan (1-5)</div>
+        <div class="stat-value" id="domPakaian">-</div>
+        <div class="stat-label">Pakaian Terbanyak</div>
       </div>
     </div>
 
@@ -112,13 +112,14 @@
             <th>Lokasi Wisuda</th>
             <th>Pakaian</th>
             <th>Konsep Hiburan</th>
-            <th>Kepuasan (Lab/Dsn/Adm)</th>
+            <th>Pesan Tambahan</th>
             <th>Saran Utama</th>
+            <th>Aksi</th>
           </tr>
         </thead>
         <tbody id="tableBody">
           <tr>
-            <td colspan="8">
+            <td colspan="9">
               <div class="loading-state">
                 <span class="spinner" style="display:inline-block; position:relative; margin-bottom: 10px;"></span>
                 <br>Memuat data dari server...
@@ -184,7 +185,7 @@
         console.error('Error fetching data:', error);
         tableBody.innerHTML = `
           <tr>
-            <td colspan="8">
+            <td colspan="9">
               <div class="error-state">
                 <span style="font-size: 2rem; display: block; margin-bottom: 10px;">⚠️</span>
                 <strong>Gagal memuat data dari server!</strong><br><br>
@@ -204,7 +205,7 @@
       if (data.length === 0) {
         tableBody.innerHTML = `
           <tr>
-            <td colspan="8">
+            <td colspan="9">
               <div class="empty-state">Belum ada data responden yang masuk ke database.</div>
             </td>
           </tr>
@@ -214,15 +215,18 @@
       }
 
       document.getElementById('totalResponden').innerText = data.length;
-      const totalLab = data.reduce((sum, row) => sum + (row.likert_lab || 0), 0);
-      const totalDosen = data.reduce((sum, row) => sum + (row.likert_dosen || 0), 0);
       
-      document.getElementById('avgLab').innerText = (totalLab / data.length).toFixed(1);
-      document.getElementById('avgDosen').innerText = (totalDosen / data.length).toFixed(1);
+      const lokasiCounts = data.reduce((acc, row) => { acc[row.lokasi] = (acc[row.lokasi] || 0) + 1; return acc; }, {});
+      const domLokasi = Object.keys(lokasiCounts).length ? Object.keys(lokasiCounts).reduce((a, b) => lokasiCounts[a] > lokasiCounts[b] ? a : b) : '-';
+      document.getElementById('domLokasi').innerText = domLokasi;
+
+      const pakaianCounts = data.reduce((acc, row) => { acc[row.pakaian] = (acc[row.pakaian] || 0) + 1; return acc; }, {});
+      const domPakaian = Object.keys(pakaianCounts).length ? Object.keys(pakaianCounts).reduce((a, b) => pakaianCounts[a] > pakaianCounts[b] ? a : b) : '-';
+      document.getElementById('domPakaian').innerText = domPakaian;
 
       let html = '';
       data.forEach(row => {
-        const dateObj = new Date(row.timestamp);
+        const dateObj = new Date(row.created_at || row.timestamp);
         const dateStr = dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }) + ' ' + dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
         html += `
@@ -236,9 +240,12 @@
             <td><span class="badge-peminatan">${escapeHtml(row.lokasi)}</span></td>
             <td><span class="badge-pakaian">${escapeHtml(row.pakaian)}</span></td>
             <td style="max-width: 200px; font-size: 0.8rem;">${escapeHtml(row.hiburan)}</td>
-            <td style="white-space: nowrap">🧪 ${row.likert_lab} &nbsp; 👨‍🏫 ${row.likert_dosen} &nbsp; 🏢 ${row.likert_admin}</td>
+            <td style="max-width: 200px; font-size: 0.8rem; font-style: italic;">"${escapeHtml(row.pesan)}"</td>
             <td style="max-width: 250px;">
               <div style="max-height: 80px; overflow-y: auto; padding-right: 5px;">${escapeHtml(row.saran)}</div>
+            </td>
+            <td>
+              <button class="btn" style="background: rgba(248, 113, 113, 0.15); color: #f87171; border: none; padding: 5px 10px; font-size: 0.75rem; border-radius: var(--radius-sm); cursor: pointer;" onclick="deleteRow('${row.id}')">Hapus</button>
             </td>
           </tr>
         `;
@@ -248,25 +255,69 @@
 
     function downloadAllCSV() {
       if (globalData.length === 0) { alert('Tidak ada data untuk diekspor!'); return; }
-      const headers = Object.keys(globalData[0]);
-      const csvRows = globalData.map(row => {
-        return headers.map(header => {
-          let cell = row[header] === null || row[header] === undefined ? '' : row[header];
-          cell = cell.toString().replace(/"/g, '""');
-          if (cell.search(/("|,|\n)/g) >= 0) cell = `"${cell}"`;
-          return cell;
-        }).join(',');
+      
+      const headers = [
+        "Waktu Pengisian", "Kode Referensi", "Nama Lengkap", "Email", "Kelas", "NIM",
+        "Pilihan Lokasi", "Pilihan Pakaian", "Pilihan Hiburan", "Saran Perbaikan", "Pesan Tambahan"
+      ];
+      
+      let html = '<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"><style>';
+      html += 'table { border-collapse: collapse; width: 100%; }';
+      html += 'th { background-color: #4f81bd; color: white; font-weight: bold; border: 1px solid #000; padding: 8px; }';
+      html += 'td { border: 1px solid #000; padding: 8px; vertical-align: top; }';
+      html += 'tr:nth-child(even) td { background-color: #dbe5f1; }';
+      html += 'tr:nth-child(odd) td { background-color: #ffffff; }';
+      html += '</style></head><body><table>';
+      
+      html += '<tr>';
+      headers.forEach(h => html += `<th>${escapeHtml(h)}</th>`);
+      html += '</tr>';
+      
+      globalData.forEach(row => {
+        html += '<tr>';
+        const dateObj = new Date(row.created_at || row.timestamp);
+        const dateStr = dateObj.toLocaleString('id-ID');
+        html += `<td>${escapeHtml(dateStr)}</td>`;
+        html += `<td>${escapeHtml(row.reference_code)}</td>`;
+        html += `<td>${escapeHtml(row.nama)}</td>`;
+        html += `<td>${escapeHtml(row.email)}</td>`;
+        html += `<td>${escapeHtml(row.kelas)}</td>`;
+        html += `<td style="mso-number-format:\'\\@\'">${escapeHtml(row.nim)}</td>`;
+        html += `<td>${escapeHtml(row.lokasi)}</td>`;
+        html += `<td>${escapeHtml(row.pakaian)}</td>`;
+        html += `<td>${escapeHtml(row.hiburan)}</td>`;
+        html += `<td>${escapeHtml(row.saran)}</td>`;
+        html += `<td>${escapeHtml(row.pesan || '-')}</td>`;
+        html += '</tr>';
       });
-      const csvContent = headers.join(',') + '\n' + csvRows.join('\n');
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      
+      html += '</table></body></html>';
+      
+      const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
       const link = document.createElement("a");
       const url = URL.createObjectURL(blob);
       link.setAttribute("href", url);
-      link.setAttribute("download", `Rekap_Wisuda_Elektro_${new Date().toISOString().slice(0,10)}.csv`);
+      link.setAttribute("download", `Rekap_Wisuda_Elektro_${new Date().toISOString().slice(0,10)}.xls`);
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+    }
+
+    async function deleteRow(id) {
+      if (!confirm('Yakin ingin menghapus data ini?')) return;
+      try {
+        const res = await fetch('/api/delete?id=' + id, { method: 'DELETE' });
+        const result = await res.json();
+        if (res.ok) {
+          alert('Data berhasil dihapus');
+          fetchData(); // reload table
+        } else {
+          alert('Gagal menghapus: ' + result.error);
+        }
+      } catch (err) {
+        alert('Terjadi kesalahan saat menghapus data.');
+      }
     }
 
     function escapeHtml(unsafe) {
